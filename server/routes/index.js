@@ -8,8 +8,18 @@ var http = require("http");
 var https = require("https");
 var passwordHash = require('password-hash');
 var Particle = require('particle-api-js');
+var Keen = require('keen-js');
+var numeral = require('numeral');
 var particle = new Particle();
 var particleToken; 
+var client = new Keen({
+  projectId: "56d4843f59949a742e00aa55",
+  writeKey: "79896022c3b32c8d03979cd19b07fe8eb2650a65bd4770a448b86cfdcf6e4cd255553fad94335109b97804232a396aa0d6c82f303c8e64a5a92a4ea44b6131163801b44f693702df499447287d32bad49c49512d57a6d420894af983681c63fc",
+  readKey: "220e7a2061873ea26ed187963abbe9872546d787ed00f440da59e173611fd8858ea7ddb12549a05f1d20f68635e95bad29221d696aa5d650115897ceb52f7ae0bade9fd9a7c05f5fb6673db69fd49a7a27e44be272dc92d79647363ea7d5eb39"
+});
+var moment = require('moment-timezone');
+moment().format();
+
 
 
 router.get('/', function(req, res, next) {
@@ -21,8 +31,95 @@ router.get('/login', function (req, res) {
 router.get('/home', function(req, res) {
     res.render('partials/home');
 });
+router.get('/loginerror', function(req, res) {
+    res.render('partials/login-error');
+});
+router.get('/consumption', function(req, res) {
+    pg.connect(connectionString, function(err, client, done){
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data:err});
+        }
+        //get user password to verify from table
+        //var query = client.query("SELECT password FROM users where email=$1;",['\''+userInfo.email+'\'']);
+        var getWattSum = 'SELECT SUM(rmscurrent) FROM currentvalues;';
+        var getLastTwoReads = 'SELECT timeread FROM currentvalues ORDER BY timeread DESC LIMIT 2;'
+        client.query(getLastTwoReads, function(err, result) {
+            if(err){
+                console.log(err);
+            }
+            var timeRead1 = result;
+            var first = result.rows[0];
+            var second = result.rows[1];
+            first = moment(first);
+            second = moment(second);
+            var duration = moment.duration(first.diff(second));
+            console.log(duration);
+            client.query(getWattSum, function(err, result){
+                var wattSum = result.rows[0].sum;
+                console.log(wattSum);
+                var wattHours = numeral(0.00277778*wattSum).format('0.000');
+                console.log(wattHours);
+                var dollars = numeral(wattHours*(11.2/1000)).format('$0,0.00');
+                res.render('partials/consumption', {wattHoursUsed: wattHours, dollarCost: dollars})
+            });
+        })
+    }); 
+});
+router.get('/api/v1/latestwattage', function(req, res){
+    pg.connect(connectionString, function(err, client, done){
+        particle.getVariable({ deviceId: '39003f000247343339373536', name: 'RMSwattage', auth: 'fee27c1ec9f8c9dbd8188886f4f60c995aabfbd6' }).then(function(data) {
+            //console.log('Device variable retrieved successfully:', data);
+            var body = data.body;
+            var date = moment.utc(body.coreInfo.last_heard).tz('America/New_York').format('D MMM h:mma z');
+            if(err) {
+                done();
+                console.log(err);
+                return res.stats(500).json({success: false, data: err});
+            }
+            var body = data.body;
+            client.query("INSERT INTO currentvalues(deviceid, timeread, rmscurrent) values($1, $2, $3)", 
+                [body.coreInfo.deviceID, body.coreInfo.last_heard, body.result]);
+                res.render('partials/home', {deviceID: body.coreInfo.deviceID, timestamp: date, wattage: body.result});
+                return res.status(200).json({ success: true, data: 'RMScurrent added!'});
+            }, function(err) {
+              console.log('An error occurred while getting attrs:', err);
+            });
+    });
 
-//*** API for creating and signing in users ***//
+    }, function(err) {
+      console.log('An error occurred while getting attrs:', err);
+    });
+
+router.post('/api/v1/signin', function(req, res) {
+    var userInfo = {email: req.body.email, password: req.body.password, phone: req.body.phone};
+
+    pg.connect(connectionString, function(err, client, done){
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data:err});
+        }
+        //get user password to verify from table
+        //var query = client.query("SELECT password FROM users where email=$1;",['\''+userInfo.email+'\'']);
+        var queryForSQL = 'SELECT password FROM users where email='+'\''+userInfo.email+'\''+';';
+        console.log(queryForSQL);
+        client.query(queryForSQL, function(err, result) {
+            if(err){
+                console.log(err);
+            }
+
+            if(passwordHash.verify(userInfo.password, result.rows[0].password)){
+                res.redirect('../../home');
+            }else{
+                res.redirect('../../loginerror');
+            }
+        }); 
+    });
+});
+
+//*** API for creating new users ***//
 router.post('/api/v1/user', function(req, res) {
     var userInfo = {email: req.body.email, password: req.body.password, phone: req.body.phone};
 
@@ -55,7 +152,7 @@ router.post('/api/v1/user', function(req, res) {
 
 router.post('/api/v1/rmscurrent', function(req, res) {
     
-    particle.getVariable({ deviceId: '39003f000247343339373536', name: 'RMScurrent', auth: 'fee27c1ec9f8c9dbd8188886f4f60c995aabfbd6' }).then(function(data) {
+    particle.getVariable({ deviceId: '39003f000247343339373536', name: 'RMSwattage', auth: 'fee27c1ec9f8c9dbd8188886f4f60c995aabfbd6' }).then(function(data) {
       //console.log('Device variable retrieved successfully:', data);
 
       pg.connect(connectionString, function(err, client, done){

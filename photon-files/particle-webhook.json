@@ -1,0 +1,10 @@
+{
+    "eventName": "keen_io_",
+    "url": "https://api.keen.io/3.0/projects/56d4843f59949a742e00aa55/events/Device39003f000247343339373536?api_key=79896022c3b32c8d03979cd19b07fe8eb2650a65bd4770a448b86cfdcf6e4cd255553fad94335109b97804232a396aa0d6c82f303c8e64a5a92a4ea44b6131163801b44f693702df499447287d32bad49c49512d57a6d420894af983681c63fc",
+    "requestType": "POST",
+    "json": {
+        "deviceid": "39003f000247343339373536",
+        "rmswattage":"{{w}}"
+    },
+    "mydevices": true
+}

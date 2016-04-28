@@ -1,0 +1,26 @@
+block body(ng-app="wattzen")
+		h1 Wattzen!
+		head
+		title=title
+		link(rel='stylesheet', href='stylesheets/login.css')
+		
+		body
+			h1 Sign Up Below!
+			h3 error signing in..please try again
+			form(name="usercreate", method="post" action="/api/v1/user")
+				div.input
+					input(type="email", name="email" placeholder="email@email.com")
+				div.input
+					input(type="password", name="password" placeholder="password")
+				div.input
+					input(type="phone", name="phone" placeholder="123-456-7890")
+				div.submit
+					input(type='submit',value='Sign Up',data-transition='fade', data-theme='c')
+			h1 Or Sign In..
+			form(name="login", method="post" action="/api/v1/signin")
+				div.input
+					input(type="email", name="email" placeholder="email@email.com")
+				div.input
+					input(type="password", name="password" placeholder="password")
+				div.input
+					input(type='submit',value='Sign In',data-transition='fade', data-theme='c')
