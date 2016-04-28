@@ -45,7 +45,7 @@ void loop() {
             filtered[1] = filtered[0];
             
             //convert the filtered value and square it, add it to the sum of 10 RMS values
-            RMSsamp = RMSsamp + pow(filtered[0]*20,2);
+            RMSsamp = RMSsamp + pow(filtered[0]*26.67,2);
             cnt = cnt + 1;
             cnt2 = cnt2 + 1;
         }
@@ -62,7 +62,7 @@ void loop() {
     RMScurrent = sqrt(RMScurrent/(2500/n_avg));//root mean
     
     //publish the RMS wattage value with a linear calibration
-    sprintf(publishString, "%lf", 120*(1.44*RMScurrent-0.25));
+    sprintf(publishString, "%lf", 120*(1.44*RMScurrent - 0.35));
     Particle.publish("RMS wattage",publishString);
     delay(1000);
  
