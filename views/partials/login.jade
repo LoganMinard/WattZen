@@ -6,7 +6,7 @@ block body(ng-app="wattzen")
 		
 		body
 			h1 Sign Up Below!
-			form(name="login", method="post" action="/api/v1/user")
+			form(name="usercreate", method="post" action="/api/v1/user")
 				div.input
 					input(type="email", name="email" placeholder="email@email.com")
 				div.input
@@ -16,7 +16,10 @@ block body(ng-app="wattzen")
 				div.submit
 					input(type='submit',value='Sign Up',data-transition='fade', data-theme='c')
 			h1 Or Sign In..
-			div.signinform
-				input(type="email", name="email" placeholder="email@email.com")
-				input(type="password", name="password" placeholder="password")
-				input(type='submit',value='Sign In',data-transition='fade', data-theme='c')
+			form(name="login", method="post" action="/api/v1/signin")
+				div.input
+					input(type="email", name="email" placeholder="email@email.com")
+				div.input
+					input(type="password", name="password" placeholder="password")
+				div.input
+					input(type='submit',value='Sign In',data-transition='fade', data-theme='c')
