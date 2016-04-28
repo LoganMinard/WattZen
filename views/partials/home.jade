@@ -3,14 +3,27 @@ head
 	script(src='https://d26b395fwzu5fz.cloudfront.net/3.4.0/keen.min.js')
 	script(type='text/javascript').
 		!function(a,b){a("Keen","https://d26b395fwzu5fz.cloudfront.net/3.4.0/keen.min.js",b)}(function(a,b,c){var d,e,f;c["_"+a]={},c[a]=function(b){c["_"+a].clients=c["_"+a].clients||{},c["_"+a].clients[b.projectId]=this,this._config=b},c[a].ready=function(b){c["_"+a].ready=c["_"+a].ready||[],c["_"+a].ready.push(b)},d=["addEvent","setGlobalProperties","trackExternalLink","on"];for(var g=0;g<d.length;g++){var h=d[g],i=function(a){return function(){return this["_"+a]=this["_"+a]||[],this["_"+a].push(arguments),this}};c[a].prototype[h]=i(h)}e=document.createElement("script"),e.async=!0,e.src=b,f=document.getElementsByTagName("script")[0],f.parentNode.insertBefore(e,f)},this);
+
 	script(type='text/javascript').
-		var myVar = setInterval(update , 10000);
-		function update(){
+		var myVar = setInterval(updateRiceCooker , 10000);
+		function updateRiceCooker(){
 			var req = new XMLHttpRequest();
-			req.open("GET","/api/v1/latestwattage");
+			req.open("GET","/api/v1/ricecooker");
 			req.onreadystatechange = function(){
 				if(req.readyState == 4){
-				document.getElementById("content").innerHTML = req.responseText;
+				document.getElementById("contentCooker").innerHTML = req.responseText;
+				}
+			}
+			req.send();
+		}
+	script(type='text/javascript').
+		var myVar = setInterval(updateToaster, 10000);
+		function updateToaster(){
+			var req = new XMLHttpRequest();
+			req.open("GET","/api/v1/toaster");
+			req.onreadystatechange = function(){
+				if(req.readyState == 4){
+				document.getElementById("contentToaster").innerHTML = req.responseText;
 				}
 			}
 			req.send();
@@ -57,7 +70,16 @@ head
 			});
 			
 	block content
+		link(rel='stylesheet', href='stylesheets/deviceform.css')
 		a(href='/consumption') See consumption
-		#content
-			h3 Current wattage: #{locals.wattage} @ #{locals.timestamp}
-			input(type="button",value="Update",onclick="update()")
+		div.contentCooker(id='contentCooker')
+			h2 Rice Cooker!
+			img(src= "http://scene7.targetimg1.com/is/image/Target/14232101?wid=480&hei=480")
+			h3 Current wattage: #{locals.wattageCooker} @ #{locals.timestampCooker}
+			console.log(locals.wattageCooker)
+			input(type="button",value="Update Cooker",onclick="updateRiceCooker()")
+		div.contentToaster(id='contentToaster')
+			h2 Iron!
+			img(src= "https://www.target.com.au/medias/static_content/product/images/large/42/99/A614299.jpg")
+			h3 Current wattage: #{locals.wattageToaster} @ #{locals.timestampToaster}
+			input(type="button",value="Update Toaster",onclick="updateToaster()")

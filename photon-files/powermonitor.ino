@@ -8,11 +8,11 @@ int cnt,cnt2;
 double n_avg = 10;
 double Vmid = 1.613;
 double voltage;
-double RMSsamp, RMScurrent;
+double RMSsamp, RMScurrent, RMSwattage;
 char publishString[40];
 
 void setup() {
-    Particle.variable("RMScurrent", &RMScurrent, DOUBLE); 
+    Particle.variable("RMSwattage", &RMSwattage, DOUBLE); 
 }
 
 void loop() {
@@ -59,11 +59,18 @@ void loop() {
     }
     
     //find the total RMS current value of the entire data set
-    RMScurrent = sqrt(RMScurrent/(2500/n_avg));//root mean
+    RMScurrent = sqrt(RMScurrent/(2500/n_avg));
+    RMSwattage = 120*(1.44*RMScurrent-0.25);
     
+    
+    //Particle.publish("keen_io_wattage","{ \"1\": \"" + String(RMSwattage) + "\", 60, PRIVATE);
+    Particle.publish("keen_io_wattage", "{ \"w\": \"" + String(RMSwattage) + "\" }", 60, PRIVATE);
     //publish the RMS wattage value with a linear calibration
-    sprintf(publishString, "%lf", 120*(1.44*RMScurrent-0.25));
-    Particle.publish("RMS wattage",publishString);
+    //sprintf(publishString, "%lf", RMSwattage);
+    //Particle.publish("thingSpeakWrite_A0", "{ \"1\": \"" + String(value) + "\", \"k\": \"XXXXXXXXXXXXXXXX\" }", 60, PRIVATE);
+    //Particle.publish("keen_io_RMSwattage", publishString);
+    //Particle.publish("custom_templates", "{ \"my-var\": \"foo\", \"my-temp\": \"98.6F\" }", 60, PRIVATE);
+    //Particle.publish("keen_io_RMSwattage", publishString);
     delay(1000);
  
 }

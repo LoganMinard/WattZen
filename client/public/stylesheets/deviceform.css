@@ -1,0 +1,16 @@
+.contentCooker {
+  background-color: #eeeeee;
+  width: 500px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 3px solid #73AD21;
+  margin: auto;
+}
+.contentToaster {
+  background-color: #eeeeee;
+  width: 700px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 3px solid #73AD21;
+  margin: auto;
+}
