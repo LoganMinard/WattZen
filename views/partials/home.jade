@@ -74,12 +74,12 @@ head
 		a(href='/consumption') See consumption
 		div.contentCooker(id='contentCooker')
 			h2 Rice Cooker!
-			img(src= "http://scene7.targetimg1.com/is/image/Target/14232101?wid=480&hei=480")
+			img(src= "http://scene7.targetimg1.com/is/image/Target/14232101?wid=480&hei=480" height="100" width="100")
 			h3 Current wattage: #{locals.wattageCooker} @ #{locals.timestampCooker}
 			console.log(locals.wattageCooker)
 			input(type="button",value="Update Cooker",onclick="updateRiceCooker()")
 		div.contentToaster(id='contentToaster')
 			h2 Iron!
-			img(src= "https://www.target.com.au/medias/static_content/product/images/large/42/99/A614299.jpg")
+			img(src= "https://www.target.com.au/medias/static_content/product/images/large/42/99/A614299.jpg" height="100" width="100")
 			h3 Current wattage: #{locals.wattageToaster} @ #{locals.timestampToaster}
 			input(type="button",value="Update Toaster",onclick="updateToaster()")
