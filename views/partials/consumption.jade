@@ -3,3 +3,5 @@ head
 		h3 this is your devices overall consumption..
 		div.energy-viz(id='energy-viz')
 			In total your device has consumed #{locals.wattHoursUsed} WattHours #{locals.dollarCost}
+		div.hr-cost(id='hr-cost')
+			In one hour your device would consume #{locals.wattPerHour} WattHours and would cost #{locals.dollarCostPerHour}
